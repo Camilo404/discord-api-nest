@@ -2,7 +2,6 @@ import { Controller, Param, Get, Res } from '@nestjs/common';
 import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { DiscordService } from './discord.service';
-import { UserData } from './dto/user.dto';
 import { UserProfileData } from './dto/userProfile.dto';
 
 @Controller('v1')
@@ -28,7 +27,7 @@ export class DiscordController {
 
     @Get('/avatar/:id')
     async avatar(@Param('id') id: string, @Res() response: Response) {
-        const userData: UserData = await this.getUserData(id);
+        const userData: UserProfileData = (await firstValueFrom(this.discordService.getUserProfileData(id))).data;
         const avatar = await firstValueFrom(this.discordService.getAvatarUrl(userData));
         const contentType = avatar.headers['content-type'];
 
@@ -38,7 +37,7 @@ export class DiscordController {
 
     @Get('/banner/:id')
     async banner(@Param('id') id: string, @Res() response: Response) {
-        const userData: UserData = await this.getUserData(id);
+        const userData: UserProfileData = (await firstValueFrom(this.discordService.getUserProfileData(id))).data;
         const banner = await firstValueFrom(this.discordService.getBannerUrl(userData));
         const contentType = banner.headers['content-type'];
 
@@ -53,11 +52,5 @@ export class DiscordController {
 
         response.setHeader('Content-Type', contentType);
         response.send(badge.data);
-    }
-
-    async getUserData(id: string): Promise<any> {
-        const response = await firstValueFrom(this.discordService.getUserData(id));
-
-        return response.data;
     }
 }
