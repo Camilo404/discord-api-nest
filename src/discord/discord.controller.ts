@@ -59,9 +59,12 @@ export class DiscordController {
     async effect(@Param('id') id: string, @Res() response: Response) {
         const userData: UserProfileData = (await firstValueFrom(this.discordService.getUserProfileData(id))).data;
         const effect: ProfileEffects = (await firstValueFrom(this.discordService.getEffectUrl())).data;
-
-        const userEffect = effect.profile_effect_configs.find(effect => effect.id === userData.user_profile.profile_effect.id);
-
-        response.send(userEffect);
+        if (!userData.user_profile.profile_effect) {
+            response.send({ message: `No effect found for the user: ${userData.user.username}` });
+        } else {
+            const userEffect = effect.profile_effect_configs.find(effect => effect.id === userData.user_profile.profile_effect.id);
+    
+            response.send(userEffect);
+        }
     }
 }
