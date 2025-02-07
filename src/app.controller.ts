@@ -24,6 +24,10 @@ export class AppController {
                 {
                     path: '/v1/badge/id.png',
                     description: 'Get badge icon image'
+                },
+                {
+                    path: 'v1/effect/id',
+                    description: 'Get user profile effect'
                 }
             ]
         }

@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { firstValueFrom } from 'rxjs';
 import { DiscordService } from './discord.service';
 import { UserProfileData } from './dto/userProfile.dto';
+import { ProfileEffects } from './dto/profileEffects.dto';
 
 @Controller('v1')
 export class DiscordController {
@@ -52,5 +53,15 @@ export class DiscordController {
 
         response.setHeader('Content-Type', contentType);
         response.send(badge.data);
+    }
+
+    @Get('/effect/:id')
+    async effect(@Param('id') id: string, @Res() response: Response) {
+        const userData: UserProfileData = (await firstValueFrom(this.discordService.getUserProfileData(id))).data;
+        const effect: ProfileEffects = (await firstValueFrom(this.discordService.getEffectUrl())).data;
+
+        const userEffect = effect.profile_effect_configs.find(effect => effect.id === userData.user_profile.profile_effect.id);
+
+        response.send(userEffect);
     }
 }
